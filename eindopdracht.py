@@ -1,161 +1,153 @@
 import math as m
 import random as r
+screen_w = 40
+words_dict = {"een":"one", "twee":"two", "drie":"three", "vier":"four", "vijf":"five", "zes":"six", "zeven":"seven"} #example list
 
-screenW = 40
-mainLoop = True
-wordsDict = {"een":"one", "twee":"two", "drie":"three", "vier":"four", "vijf":"five", "zes":"six", "zeven":"seven"}
+def main(words_dict):
 
-def main():
-    global mainLoop
-    global wordsDict
-    printMenu()
-    option = input("optie? (int) ")
+    print_menu()
+    while (option := input("optie? (int) ")) != "8":
+        if option == "1":
+            print_word_list(words_dict)
+        elif option == "2":
+            words_dict = words_clear()
+        elif option == "3":
+            words_dict = word_change(words_dict)
+        elif option == "4":
+            words_dict = add_word(words_dict)
+        elif option == "5":
+            quiz(words_dict)
+        elif option == "6":
+            write_words_dict(words_dict)
+        elif option == "7":
+            words_dict = load_words_dict(words_dict)
+        print_menu()
 
-    if option == "8":
-        mainLoop = False
-    elif option == "1":
-        printWordList()
-    elif option == "2":
-        wordsClear()
-    elif option == "3":
-        wordChange()
-    elif option == "4":
-        addWord()
-    elif option == "5":
-        quiz()
-    elif option == "6":
-        writeWordsDict()
-    elif option == "7":
-        loadWordsDict()
 
-def printMenu():
-    printBorder("menu")
-    menuRow("print woordenlijst", "1")
-    menuRow("nieuwe woordenlijst", "2")
-    menuRow("verander woord", "3")
-    menuRow("woorden toevoegen", "4")
-    menuRow("overhoren", "5")
-    menuRow("woorden lijst opslaan (.txt)", "6")
-    menuRow("woorden lijst laden", "7")
-    menuRow("stoppen", "8")
-    printBorder("")
+def print_menu():
+    print_border("menu")
+    menu_row("print woordenlijst", "1")
+    menu_row("nieuwe woordenlijst", "2")
+    menu_row("verander woord", "3")
+    menu_row("woorden toevoegen", "4")
+    menu_row("overhoren", "5")
+    menu_row("woorden lijst opslaan (.txt)", "6")
+    menu_row("woorden lijst laden", "7")
+    menu_row("stoppen", "8")
+    print_border("")
 
-def printWordList():
-    if len(wordsDict) > 0:
-        printBorder("woorden lijst")
-        for key in wordsDict:
-            wordListRow(key, wordsDict[key])
-        printBorder("")
+def print_word_list(words_dict):
+    if len(words_dict) > 0:
+        print_border("woorden lijst")
+        for key in words_dict:
+            word_list_row(key, words_dict[key])
+        print_border("")
     else:
-        printNot("error", "de woordenlijst is leeg")
+        print_not("error", "de woordenlijst is leeg")
 
-def wordsClear():
-    global wordsDict
-    wordsDict = {}
-    printNot("woordenlijst", "woordenlijst is geleegd")
+def words_clear():
+    print_not("woordenlijst", "woordenlijst is geleegd")
+    return {}
         
-def wordChange():
-    printWordList()
+def word_change(words_dict):
+    print_word_list(words_dict)
     if input("woord of vertaling veranderen? woord: 1 | vertaling: 2 ") == "1":
         key = input("woord? ")
-        newKey = input("nieuw woord? ")
-        wordsDict[newKey] = wordsDict.pop(key)
-        printNot("verandering", "woord veranderd")
+        new_key = input("nieuw woord? ")
+        words_dict[new_key] = words_dict.pop(key)
+        print_not("verandering", "woord veranderd")
     else:
         key = input("woord (geen vertaling)? ")
-        newValue = input("nieuwe vertaling? ")
-        wordsDict[key] = newValue
-        printNot("verandering", "vertaling veranderd")
+        new_value = input("nieuwe vertaling? ")
+        words_dict[key] = new_value
+        print_not("verandering", "vertaling veranderd")
+    return words_dict
 
-def addWord():
-    newKey = input("nieuw woord? ")
-    newValue = input("nieuwe vertaling? ")
-    wordsDict[newKey] = newValue
-    printNot("verandering", "nieuw woord toegevoegd")
+def add_word(words_dict):
+    new_key = input("nieuw woord? ")
+    new_value = input("nieuwe vertaling? ")
+    print_not("verandering", "nieuw woord toegevoegd")
+    words_dict[new_key] = new_value
+    return words_dict
 
-def quiz():
-    global mistakes
+def quiz(words_dict):
     mistakes = 0
-    scoreList = []
+    score_list = []
     if input("1: woord naar vertaling | 2: vertaling naar woord ") == "1":
-        quizQuestions = list(wordsDict.keys())
-        quizAnswers = list(wordsDict.values())
+        quiz_questions = list(words_dict.keys())
+        quiz_answers = list(words_dict.values())
     else:
-        quizQuestions = list(wordsDict.values())
-        quizAnswers = list(wordsDict.keys())
+        quiz_questions = list(words_dict.values())
+        quiz_answers = list(words_dict.keys())
 
-    amountQuestions = int(input("hoe vaak? (er zitten " + str(len(quizQuestions)) + " woorden in de lijst) " ))
-    for i in range(amountQuestions):
-        index = r.randrange(0, len(quizQuestions))
-        question(quizQuestions[index], quizAnswers[index])
+    amount_questions = int(input("hoe vaak? (er zitten " + str(len(quiz_questions)) + " woorden in de lijst) " ))
+    for i in range(amount_questions):
+        index = r.randrange(0, len(quiz_questions))
+        mistakes = question(quiz_questions[index], quiz_answers[index], mistakes)
 
-    printResults(amountQuestions, quizQuestions)
+    print_results(amount_questions, quiz_questions, mistakes)
 
-def writeWordsDict():
+def write_words_dict(words_dict):
     f = open(input("naam van nieuw bestand? (bijv: lijst.txt) "), "w")
 
-    for key in wordsDict:
-        f.write(key + "=" + wordsDict[key] + "\n")
+    for key in words_dict:
+        f.write(key + "=" + words_dict[key] + "\n")
     
     f.close()
 
-def loadWordsDict():
-    global wordsDict
-    wordsDict = {}
+def load_words_dict(words_dict):
+    words_dict = {}
     if input("lijst laden? dit verwijderd de huidige lijst. ja|nee ") == "ja":
-        fileName = input("naam van bestand? (bijv: lijst.txt) ")
-        with open(fileName) as f:
-            fileData = f.read().split('\n')
+        file_name = input("naam van bestand? (bijv: lijst.txt) ")
+        with open(file_name) as f:
+            file_data = f.read().split('\n')
 
-    for item in fileData:
+    for item in file_data:
         if "=" in item:
             word, translation = item.split('=')
-            wordsDict[word] = translation
+            words_dict[word] = translation
 
-    printNot("lijst geladen", fileName + " geladen")
+    print_not("lijst geladen", file_name + " geladen")
+    return words_dict
 
 
 
-def question(question, answer):
-    global mistakes
+def question(question, answer, mistakes):
     if input(question + " ") == answer:
         print("goed ")
     else:
         print("fout, het was: " + answer + " ")
         mistakes += 1
+    return mistakes
 
-def printResults(amountQuestions, quizQuestions):
-    printBorder("resultaten")
-    printRow("aantal woorden: " + str(len(quizQuestions)))
-    printRow("aantal vragen: " + str(amountQuestions))
-    printRow("aantal fouten: " + str(mistakes))
-    printRow("aantal goed: " + str(amountQuestions-mistakes))
-    printRow("precentage goed: %" + str(round((amountQuestions-mistakes)/amountQuestions*100)))
-    printBorder("")
+def print_results(amount_questions, quiz_questions, mistakes):
+    print_border("resultaten")
+    print_row("aantal woorden: " + str(len(quiz_questions)))
+    print_row("aantal vragen: " + str(amount_questions))
+    print_row("aantal fouten: " + str(mistakes))
+    print_row("aantal goed: " + str(amount_questions-mistakes))
+    print_row("precentage goed: %" + str(round((amount_questions-mistakes)/amount_questions*100)))
+    print_border("")
 
-def printNot(title, message):
-    printBorder(title)
-    printRow(message)
-    printBorder("")
+def print_not(title, message):
+    print_border(title)
+    print_row(message)
+    print_border("")
 
-def printRow(s):
-    print(("| " + "{:" + str(screenW-1)+ "}").format(s) + "|")
+def print_row(s):
+    print(("| " + "{:" + str(screen_w-1)+ "}").format(s) + "|")
 
-def wordListRow(word, translation):
-    space =  screenW-3-round((len(word)+len(translation))/2)
+def word_list_row(word, translation):
+    space =  screen_w-3-round((len(word)+len(translation))/2)
     print(("| " + word + ": {:" + str(space)+ "}").format(translation) + "|")    
 
-def menuRow(word, number):
-    print(("| " + number + ": {:" + str(screenW-4)+ "}").format(word) + "|")
+def menu_row(word, number):
+    print(("| " + number + ": {:" + str(screen_w-4)+ "}").format(word) + "|")
 
-def printBorder(word):
+def print_border(word):
     if word == "":
-        print("+" + screenW*"-" + "+")
+        print("+" + screen_w*"-" + "+")
     else:
-        print("+" + int(screenW/2-len(word)/2-1)*"-" + "=" + word + "=" + int(screenW/2-len(word)/2-1 + len(word)%2)*"-" + "+")
+        print("+" + int(screen_w/2-len(word)/2-1)*"-" + "=" + word + "=" + int(screen_w/2-len(word)/2-1 + len(word)%2)*"-" + "+")
 
-
-    
-
-while mainLoop:
-    main()
+main(words_dict)
