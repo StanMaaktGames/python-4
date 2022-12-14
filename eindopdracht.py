@@ -1,39 +1,40 @@
 import math as m
 import random as r
 screen_w = 40
-words_dict = {"een":"one", "twee":"two", "drie":"three", "vier":"four", "vijf":"five", "zes":"six", "zeven":"seven"} #example list
 
-def main(words_dict):
-
+def main():
+    words_dict = {"een":"one", "twee":"two", "drie":"three", "vier":"four", "vijf":"five", "zes":"six", "zeven":"seven"} 
     print_menu()
-    while (option := input("optie? (int) ")) != "8":
+    while (option := input("optie? (int) ")) != "9":
         if option == "1":
             print_word_list(words_dict)
         elif option == "2":
             words_dict = words_clear()
         elif option == "3":
-            words_dict = word_change(words_dict)
+            word_change(words_dict)
         elif option == "4":
-            words_dict = add_word(words_dict)
+            add_word(words_dict)
         elif option == "5":
-            quiz(words_dict)
+            delete_word(words_dict)
         elif option == "6":
-            write_words_dict(words_dict)
+            quiz(words_dict)
         elif option == "7":
-            words_dict = load_words_dict(words_dict)
+            write_words_dict(words_dict)
+        elif option == "8":
+            load_words_dict(words_dict)
         print_menu()
-
 
 def print_menu():
     print_border("menu")
     menu_row("print woordenlijst", "1")
     menu_row("nieuwe woordenlijst", "2")
     menu_row("verander woord", "3")
-    menu_row("woorden toevoegen", "4")
-    menu_row("overhoren", "5")
-    menu_row("woorden lijst opslaan (.txt)", "6")
-    menu_row("woorden lijst laden", "7")
-    menu_row("stoppen", "8")
+    menu_row("woord toevoegen", "4")
+    menu_row("woord verwijderen", "5")
+    menu_row("overhoren", "6")
+    menu_row("woorden lijst opslaan (.txt)", "7")
+    menu_row("woorden lijst laden", "8")
+    menu_row("stoppen", "9")
     print_border("")
 
 def print_word_list(words_dict):
@@ -61,31 +62,39 @@ def word_change(words_dict):
         new_value = input("nieuwe vertaling? ")
         words_dict[key] = new_value
         print_not("verandering", "vertaling veranderd")
-    return words_dict
 
 def add_word(words_dict):
     new_key = input("nieuw woord? ")
     new_value = input("nieuwe vertaling? ")
     print_not("verandering", "nieuw woord toegevoegd")
     words_dict[new_key] = new_value
-    return words_dict
+
+def delete_word(words_dict):
+    word = input("welk woord wil je verwijderen? ")
+    del words_dict[word]
 
 def quiz(words_dict):
     mistakes = 0
     score_list = []
+    amount_questions = int(input("hoe vaak? (er zitten " + str(len(words_dict)) + " woorden in de lijst) " ))
+    counter = 0
+
     if input("1: woord naar vertaling | 2: vertaling naar woord ") == "1":
-        quiz_questions = list(words_dict.keys())
-        quiz_answers = list(words_dict.values())
+        while counter < amount_questions:
+            for key, value in words_dict.items():
+                mistakes = question(key, value, mistakes)
+                counter += 1
+                if counter == amount_questions:
+                    break    
     else:
-        quiz_questions = list(words_dict.values())
-        quiz_answers = list(words_dict.keys())
+        while counter < amount_questions:
+            for key, value in words_dict.items():
+                mistakes = question(value, key, mistakes)
+                counter += 1
+                if counter == amount_questions:
+                    break    
 
-    amount_questions = int(input("hoe vaak? (er zitten " + str(len(quiz_questions)) + " woorden in de lijst) " ))
-    for i in range(amount_questions):
-        index = r.randrange(0, len(quiz_questions))
-        mistakes = question(quiz_questions[index], quiz_answers[index], mistakes)
-
-    print_results(amount_questions, quiz_questions, mistakes)
+    print_results(amount_questions, words_dict, mistakes)
 
 def write_words_dict(words_dict):
     f = open(input("naam van nieuw bestand? (bijv: lijst.txt) "), "w")
@@ -108,7 +117,6 @@ def load_words_dict(words_dict):
             words_dict[word] = translation
 
     print_not("lijst geladen", file_name + " geladen")
-    return words_dict
 
 
 
@@ -120,9 +128,9 @@ def question(question, answer, mistakes):
         mistakes += 1
     return mistakes
 
-def print_results(amount_questions, quiz_questions, mistakes):
+def print_results(amount_questions, words_dict, mistakes):
     print_border("resultaten")
-    print_row("aantal woorden: " + str(len(quiz_questions)))
+    print_row("aantal woorden: " + str(len(words_dict)))
     print_row("aantal vragen: " + str(amount_questions))
     print_row("aantal fouten: " + str(mistakes))
     print_row("aantal goed: " + str(amount_questions-mistakes))
@@ -150,4 +158,4 @@ def print_border(word):
     else:
         print("+" + int(screen_w/2-len(word)/2-1)*"-" + "=" + word + "=" + int(screen_w/2-len(word)/2-1 + len(word)%2)*"-" + "+")
 
-main(words_dict)
+main()
